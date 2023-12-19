@@ -1,3 +1,3 @@
-module github.com/The-fthe/pokedexcli
+module github.com/The-fthe/pokedex
 
 go 1.21.5
