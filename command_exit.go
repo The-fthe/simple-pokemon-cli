@@ -1,8 +1,10 @@
 package main
 
-import ("os")
+import (
+	"os"
+)
 
-func commandExit()error{
-  os.Exit(0)
-  return nil
+func commandExit(c *Config) error {
+	os.Exit(0)
+	return nil
 }

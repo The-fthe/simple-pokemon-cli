@@ -2,6 +2,9 @@ package main
 
 import (
 	"testing"
+	"time"
+
+	"github.com/The-fthe/pokedex/internal/pokeapi"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -44,14 +47,22 @@ func TestCleanInput(t *testing.T) {
 }
 
 func TestURLBodyParsing(t *testing.T) {
-	data, err := readBody("https://pokeapi.co/api/v2/location-area")
+	pokeClient := pokeapi.NewClient(5 * time.Second)
+	c := &Config{
+		pokeapiClient: pokeClient,
+	}
+	data, err := c.pokeapiClient.ListLocation(c.nextLocationURL)
 	if err != nil {
 		t.Errorf("readbody error: %s", err.Error())
 	}
 
 	expected := "https://pokeapi.co/api/v2/location-area?offset=20&limit=20"
-	if data.Next != expected {
-		t.Errorf("url don't match Actual :\n '%s' \nvs Expected: \n '%s'", data.Next, expected)
+	if data.Next == nil {
+		t.Error("data is error")
+	}
+
+	if *data.Next != expected {
+		t.Errorf("url don't match Actual :\n '%s' \nvs Expected: \n '%s'", *data.Next, expected)
 	}
 }
 
@@ -78,10 +89,18 @@ func TestMapNameIsMatch(t *testing.T) {
 		"mt-coronet-6f",
 		"mt-coronet-1f-from-exterior",
 	}
+	pokeClient := pokeapi.NewClient(5 * time.Second)
+	c := &Config{
+		pokeapiClient: pokeClient,
+	}
 
-	data, err := readBody("https://pokeapi.co/api/v2/location-area")
+	data, err := c.pokeapiClient.ListLocation(c.nextLocationURL)
 	if err != nil {
 		t.Errorf("readbody error: %s", err.Error())
+	}
+
+	if data.Next == nil {
+		t.Error("data is error")
 	}
 
 	for i, name := range expectedNames {
@@ -90,23 +109,49 @@ func TestMapNameIsMatch(t *testing.T) {
 			return
 		}
 	}
-
 }
 
 func TestPreviousURL(t *testing.T) {
-	data, err := readBody("https://pokeapi.co/api/v2/location-area")
-	if err != nil {
-		t.Errorf("readbody error: %s", err.Error())
+	pokeClient := pokeapi.NewClient(5 * time.Second)
+	c := &Config{
+		pokeapiClient: pokeClient,
 	}
 
+	data1, err := c.pokeapiClient.ListLocation(c.nextLocationURL)
+	if err != nil {
+		t.Errorf("readbody error: %s", err.Error())
+		return
+	}
+	c.nextLocationURL = data1.Next
+	c.prevLocationURL = data1.Previous
+
 	expected := "https://pokeapi.co/api/v2/location-area?offset=20&limit=20"
-	if data.Next != expected {
-		t.Errorf("url don't match Actual :\n '%s' \nvs Expected: \n '%s'", data.Next, expected)
+	if *data1.Next != expected {
+		t.Errorf("url don't match Actual :\n '%s' \nvs Expected: \n '%s'", *data1.Next, expected)
+		return
+	}
+
+	data2, err := c.pokeapiClient.ListLocation(c.nextLocationURL)
+	if err != nil {
+		t.Errorf("readbody error: %s", err.Error())
+		return
+	}
+	c.nextLocationURL = data2.Next
+	c.prevLocationURL = data2.Previous
+
+	if data2.Next == nil {
+		t.Error("data is error")
+		return
 	}
 
 	expected_previousValue := ""
-	if data.Previous != expected_previousValue {
-		t.Errorf("previos don't match actual : \n'%s' \nvs Expeted: \n '%s'", data.Previous, expected_previousValue)
+	if data2.Previous == nil {
+		t.Error("previous is nil")
+		return
+	}
+
+	if *data2.Previous == expected_previousValue {
+		t.Errorf("previos don't match actual : \n'%s' \nvs Expeted: \n '%s'", *data2.Previous, expected_previousValue)
 	}
 
 }

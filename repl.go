@@ -5,11 +5,18 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/The-fthe/pokedex/internal/pokeapi"
 )
 
-func startRepl() {
+type Config struct {
+	pokeapiClient   pokeapi.Client
+	nextLocationURL *string
+	prevLocationURL *string
+}
+
+func startRepl(c *Config) {
 	reader := bufio.NewScanner(os.Stdin)
-	config := Config{}
 	for {
 		fmt.Print("Pokedex >")
 		reader.Scan()
@@ -20,9 +27,9 @@ func startRepl() {
 		}
 
 		cmdName := words[0]
-		cmd, ok := config.getCommands()[cmdName]
+		cmd, ok := getCommands(c)[cmdName]
 		if ok {
-			err := cmd.callback()
+			err := cmd.callback(c)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -43,15 +50,15 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*Config) error
 }
 
-func (c *Config) getCommands() map[string]cliCommand {
+func getCommands(c *Config) map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
 			name:        "help",
 			description: "Displays a help message",
-			callback:    c.commandHelp,
+			callback:    commandHelp,
 		},
 		"exit": {
 			name:        "exit",
@@ -61,12 +68,12 @@ func (c *Config) getCommands() map[string]cliCommand {
 		"map": {
 			name:        "map",
 			description: "display next 20 locations",
-			callback:    c.map_next,
+			callback:    commandMapForward,
 		},
 		"mapb": {
 			name:        "map back",
 			description: "display previous 20 locations",
-			callback:    c.map_previous,
+			callback:    commandMapPrevious,
 		},
 	}
 }

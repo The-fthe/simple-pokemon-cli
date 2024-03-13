@@ -2,11 +2,11 @@ package main
 
 import "fmt"
 
-func (c *Config) commandHelp() error {
+func commandHelp(c *Config) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
-	for _, cmd := range c.getCommands() {
+	for _, cmd := range getCommands(c) {
 		help(cmd)
 	}
 	fmt.Println()
