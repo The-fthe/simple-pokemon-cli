@@ -84,15 +84,29 @@ func TestMapNameIsMatch(t *testing.T) {
 		t.Errorf("readbody error: %s", err.Error())
 	}
 
-	// if data.Results[0].Name != expectedNames[0] {
-	// 	t.Errorf("\nExpected: %s \n Actual: %s", data.Results[0].Name, data.Results[0].Name)
-	// 	return
-	// }
 	for i, name := range expectedNames {
 		if data.Results[i].Name != name {
 			t.Errorf("Expected: %s \n Actual: %s", name, data.Results[i].Name)
 			return
 		}
+	}
+
+}
+
+func TestPreviousURL(t *testing.T) {
+	data, err := readBody("https://pokeapi.co/api/v2/location-area")
+	if err != nil {
+		t.Errorf("readbody error: %s", err.Error())
+	}
+
+	expected := "https://pokeapi.co/api/v2/location-area?offset=20&limit=20"
+	if data.Next != expected {
+		t.Errorf("url don't match Actual :\n '%s' \nvs Expected: \n '%s'", data.Next, expected)
+	}
+
+	expected_previousValue := ""
+	if data.Previous != expected_previousValue {
+		t.Errorf("previos don't match actual : \n'%s' \nvs Expeted: \n '%s'", data.Previous, expected_previousValue)
 	}
 
 }

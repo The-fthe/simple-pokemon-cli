@@ -8,6 +8,12 @@ import (
 	"net/http"
 )
 
+type Config struct {
+	URL      string
+	Next     string
+	Previous string
+}
+
 type Result struct {
 	Name string `json:"name"`
 	URL  string `json:"url"`
@@ -19,15 +25,101 @@ type ResultData struct {
 	Results  []Result
 }
 
-func map_next() error {
-	return errors.New("")
+func (c *Config) createNewConfig() error {
+	c.URL = "https://pokeapi.co/api/v2/location-area"
+
+	data, err := readBody(c.URL)
+	if err != nil {
+		return fmt.Errorf("read body error: {%s}", err.Error())
+	}
+
+	c.Next = data.Next
+	c.Previous = data.Previous
+	return nil
 }
 
-func map_previous() error {
-	return errors.New("")
+func (c *Config) map_next() error {
+	//if next is empty print current url result location-area
+	fmt.Printf("start c url: %s \n", c.URL)
+	if c.URL == "" {
+		err := c.createNewConfig()
+		if err != nil {
+			return err
+		}
+
+		data, err := readBody(c.URL)
+		if err != nil {
+			return err
+		}
+
+		c.Next = data.Next
+		c.Previous = data.Previous
+
+		mapNames := c.GetResultMapNames(data)
+		for _, mapName := range mapNames {
+			fmt.Println(mapName)
+		}
+		return nil
+	}
+	fmt.Printf("next available c next: %s \n", c.Next)
+
+	//if next exist print next url location-area
+	data, err := readBody(c.Next)
+	if err != nil {
+		return err
+	}
+
+	c.Next = data.Next
+	c.Previous = data.Previous
+
+	mapNames := c.GetResultMapNames(data)
+	for _, mapName := range mapNames {
+		fmt.Println(mapName)
+	}
+
+	return nil
 }
 
-func GetResultMapNames(data ResultData) []string {
+func (c *Config) map_previous() error {
+	if c.URL == "" || c.Previous == "" {
+		err := c.createNewConfig()
+		if err != nil {
+			return err
+		}
+
+		data, err := readBody(c.URL)
+		if err != nil {
+			return err
+		}
+
+		c.Next = data.Next
+		c.Previous = data.Previous
+
+		mapNames := c.GetResultMapNames(data)
+		for _, mapName := range mapNames {
+			fmt.Println(mapName)
+		}
+		return nil
+	}
+
+	//if previous exist print next url location-area
+	data, err := readBody(c.Previous)
+	if err != nil {
+		return err
+	}
+
+	c.Next = data.Next
+	c.Previous = data.Previous
+
+	mapNames := c.GetResultMapNames(data)
+	for _, mapName := range mapNames {
+		fmt.Println(mapName)
+	}
+
+	return nil
+}
+
+func (c *Config) GetResultMapNames(data ResultData) []string {
 	var mapNames []string
 	for _, m := range data.Results {
 		mapNames = append(mapNames, m.Name)
