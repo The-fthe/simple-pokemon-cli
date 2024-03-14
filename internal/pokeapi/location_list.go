@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"time"
+
+	"github.com/The-fthe/pokedex/internal/pokecache"
 )
 
 func (c *Client) ListLocation(pageURL *string) (RespLocations, error) {
@@ -27,6 +30,8 @@ func (c *Client) ListLocation(pageURL *string) (RespLocations, error) {
 	if err != nil {
 		return RespLocations{}, err
 	}
+	cache := pokecache.NewCache(5 * time.Second)
+	cache.Add(url, dat)
 
 	locationResp := RespLocations{}
 	err = json.Unmarshal(dat, &locationResp)
