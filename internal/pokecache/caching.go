@@ -33,7 +33,7 @@ func (c *Cache) Get(url string) ([]byte, bool) {
 
 	entry, ok := c.cacheTable[url]
 	if !ok {
-		fmt.Printf("URL not found in cache")
+		fmt.Printf("\nURL not found in cache\n")
 		return nil, false
 	}
 
@@ -47,10 +47,11 @@ func (c *Cache) reapLoop(interval time.Duration) {
 
 	for range ticker.C {
 		c.Lock()
+		currTime := time.Now()
 		for url, entry := range c.cacheTable {
-			if time.Since(entry.createAt) > interval {
+			if entry.createAt.Add(interval).Before(currTime) {
 				delete(c.cacheTable, url)
-				fmt.Printf("cache is being deleted\n")
+				fmt.Printf("\ncache is being deleted\n")
 			}
 		}
 		c.Unlock()

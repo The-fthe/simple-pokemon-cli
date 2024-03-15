@@ -10,7 +10,7 @@ import (
 
 func main() {
 	pokeClient := pokeapi.NewClient(5 * time.Second)
-	pokeCache := pokecache.NewCache(60 * time.Second)
+	pokeCache := pokecache.NewCache(5 * time.Second)
 	if pokeCache == nil {
 		fmt.Printf("pokeCache is nil!!")
 		return

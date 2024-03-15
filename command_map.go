@@ -15,7 +15,7 @@ func commandMapForward(c *Config) error {
 	if c.nextLocationURL != nil {
 		dat, ok := c.pokeCache.Get(*c.nextLocationURL)
 		if !ok {
-			locationsResp, err = c.pokeapiClient.ListLocation(c.nextLocationURL)
+			locationsResp, err = c.pokeapiClient.ListLocation(c.nextLocationURL, c.pokeCache)
 			if err != nil {
 				return err
 			}
@@ -26,7 +26,7 @@ func commandMapForward(c *Config) error {
 			}
 		}
 	} else {
-		locationsResp, err = c.pokeapiClient.ListLocation(c.nextLocationURL)
+		locationsResp, err = c.pokeapiClient.ListLocation(c.nextLocationURL, c.pokeCache)
 		if err != nil {
 			return err
 		}
@@ -52,7 +52,7 @@ func commandMapPrevious(c *Config) error {
 	dat, ok := c.pokeCache.Get(*c.prevLocationURL)
 	ok = false
 	if !ok {
-		locationsResp, err = c.pokeapiClient.ListLocation(c.prevLocationURL)
+		locationsResp, err = c.pokeapiClient.ListLocation(c.prevLocationURL, c.pokeCache)
 		if err != nil {
 			return err
 		}
