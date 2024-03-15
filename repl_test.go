@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/The-fthe/pokedex/internal/pokeapi"
-	"github.com/The-fthe/pokedex/internal/pokecache"
 )
 
 func TestCleanInput(t *testing.T) {
@@ -48,12 +47,11 @@ func TestCleanInput(t *testing.T) {
 }
 
 func TestURLBodyParsing(t *testing.T) {
-	pokeClient := pokeapi.NewClient(5 * time.Second)
+	pokeClient := pokeapi.NewClient(5*time.Second, time.Minute*5)
 	c := &Config{
 		pokeapiClient: pokeClient,
 	}
-	cache := pokecache.NewCache(60 * time.Second)
-	data, err := c.pokeapiClient.ListLocation(c.nextLocationURL, cache)
+	data, err := c.pokeapiClient.ListLocation(c.nextLocationURL)
 	if err != nil {
 		t.Errorf("readbody error: %s", err.Error())
 	}
@@ -91,13 +89,12 @@ func TestMapNameIsMatch(t *testing.T) {
 		"mt-coronet-6f",
 		"mt-coronet-1f-from-exterior",
 	}
-	pokeClient := pokeapi.NewClient(5 * time.Second)
+	pokeClient := pokeapi.NewClient(5*time.Second, time.Minute*5)
 	c := &Config{
 		pokeapiClient: pokeClient,
 	}
 
-	cache := pokecache.NewCache(60 * time.Second)
-	data, err := c.pokeapiClient.ListLocation(c.nextLocationURL, cache)
+	data, err := c.pokeapiClient.ListLocation(c.nextLocationURL)
 	if err != nil {
 		t.Errorf("readbody error: %s", err.Error())
 	}
@@ -115,13 +112,12 @@ func TestMapNameIsMatch(t *testing.T) {
 }
 
 func TestPreviousURL(t *testing.T) {
-	pokeClient := pokeapi.NewClient(5 * time.Second)
+	pokeClient := pokeapi.NewClient(5*time.Second, time.Minute*5)
 	c := &Config{
 		pokeapiClient: pokeClient,
 	}
 
-	cache := pokecache.NewCache(60 * time.Second)
-	data1, err := c.pokeapiClient.ListLocation(c.nextLocationURL, cache)
+	data1, err := c.pokeapiClient.ListLocation(c.nextLocationURL)
 	if err != nil {
 		t.Errorf("readbody error: %s", err.Error())
 		return
@@ -135,7 +131,7 @@ func TestPreviousURL(t *testing.T) {
 		return
 	}
 
-	data2, err := c.pokeapiClient.ListLocation(c.nextLocationURL, cache)
+	data2, err := c.pokeapiClient.ListLocation(c.nextLocationURL)
 	if err != nil {
 		t.Errorf("readbody error: %s", err.Error())
 		return

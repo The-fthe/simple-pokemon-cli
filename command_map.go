@@ -1,35 +1,15 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-
-	"github.com/The-fthe/pokedex/internal/pokeapi"
 )
 
 func commandMapForward(c *Config) error {
-	var locationsResp pokeapi.RespLocations
-	var err error
 
-	if c.nextLocationURL != nil {
-		dat, ok := c.pokeCache.Get(*c.nextLocationURL)
-		if !ok {
-			locationsResp, err = c.pokeapiClient.ListLocation(c.nextLocationURL, c.pokeCache)
-			if err != nil {
-				return err
-			}
-		} else {
-			err := json.Unmarshal(dat, &locationsResp)
-			if err != nil {
-				return err
-			}
-		}
-	} else {
-		locationsResp, err = c.pokeapiClient.ListLocation(c.nextLocationURL, c.pokeCache)
-		if err != nil {
-			return err
-		}
+	locationsResp, err := c.pokeapiClient.ListLocation(c.nextLocationURL)
+	if err != nil {
+		return err
 	}
 
 	c.nextLocationURL = locationsResp.Next
@@ -46,21 +26,9 @@ func commandMapPrevious(c *Config) error {
 		return errors.New("you are in first page")
 	}
 
-	var locationsResp pokeapi.RespLocations
-	var err error
-
-	dat, ok := c.pokeCache.Get(*c.prevLocationURL)
-	ok = false
-	if !ok {
-		locationsResp, err = c.pokeapiClient.ListLocation(c.prevLocationURL, c.pokeCache)
-		if err != nil {
-			return err
-		}
-	} else {
-		err := json.Unmarshal(dat, &locationsResp)
-		if err != nil {
-			return err
-		}
+	locationsResp, err := c.pokeapiClient.ListLocation(c.prevLocationURL)
+	if err != nil {
+		return err
 	}
 
 	c.nextLocationURL = locationsResp.Next

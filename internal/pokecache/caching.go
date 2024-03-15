@@ -2,12 +2,14 @@ package pokecache
 
 import (
 	"fmt"
+	"sync"
 	"time"
 )
 
-func NewCache(interval time.Duration) *Cache {
-	c := &Cache{
+func NewCache(interval time.Duration) Cache {
+	c := Cache{
 		cacheTable: make(map[string]CacheEntry),
+		mu:         &sync.Mutex{},
 	}
 
 	go c.reapLoop(interval)
@@ -16,28 +18,21 @@ func NewCache(interval time.Duration) *Cache {
 }
 
 func (c *Cache) Add(url string, data []byte) {
-	c.Lock()
-	defer c.Unlock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
-	entry := CacheEntry{
-		createAt: time.Now(),
+	c.cacheTable[url] = CacheEntry{
+		createAt: time.Now().UTC(),
 		val:      data,
 	}
-
-	c.cacheTable[url] = entry
 }
 
 func (c *Cache) Get(url string) ([]byte, bool) {
-	c.Lock()
-	defer c.Unlock()
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
 	entry, ok := c.cacheTable[url]
-	if !ok {
-		fmt.Printf("\nURL not found in cache\n")
-		return nil, false
-	}
-
-	return entry.val, true
+	return entry.val, ok
 }
 
 // remote cacheEntry that is older than interval
@@ -46,14 +41,18 @@ func (c *Cache) reapLoop(interval time.Duration) {
 	defer ticker.Stop()
 
 	for range ticker.C {
-		c.Lock()
-		currTime := time.Now()
-		for url, entry := range c.cacheTable {
-			if entry.createAt.Add(interval).Before(currTime) {
-				delete(c.cacheTable, url)
-				fmt.Printf("\ncache is being deleted\n")
-			}
-		}
-		c.Unlock()
+		c.reap(time.Now().UTC(), interval)
 	}
+}
+
+func (c *Cache) reap(now time.Time, interval time.Duration) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	for url, entry := range c.cacheTable {
+		if entry.createAt.Before(now.Add(-interval)) {
+			delete(c.cacheTable, url)
+			fmt.Printf("\ncache is being deleted\n")
+		}
+	}
+
 }

@@ -3,16 +3,13 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/The-fthe/pokedex/internal/pokeapi"
 	"os"
 	"strings"
-
-	"github.com/The-fthe/pokedex/internal/pokeapi"
-	"github.com/The-fthe/pokedex/internal/pokecache"
 )
 
 type Config struct {
 	pokeapiClient   pokeapi.Client
-	pokeCache       *pokecache.Cache
 	nextLocationURL *string
 	prevLocationURL *string
 }
