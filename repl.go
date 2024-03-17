@@ -9,7 +9,8 @@ import (
 )
 
 type Config struct {
-	pokeapiClient   pokeapi.Client
+	pokeapiClient   *pokeapi.Client
+	parameter       *string
 	nextLocationURL *string
 	prevLocationURL *string
 }
@@ -26,7 +27,10 @@ func startRepl(c *Config) {
 		}
 
 		cmdName := words[0]
-		cmd, ok := getCommands(c)[cmdName]
+		//c.parameter = &words[1]
+		test := "test"
+		c.parameter = &test
+		cmd, ok := getCommands()[cmdName]
 		if ok {
 			err := cmd.callback(c)
 			if err != nil {
@@ -52,7 +56,7 @@ type cliCommand struct {
 	callback    func(*Config) error
 }
 
-func getCommands(c *Config) map[string]cliCommand {
+func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"help": {
 			name:        "help",

@@ -12,5 +12,5 @@ type CacheEntry struct {
 
 type Cache struct {
 	cacheTable map[string]CacheEntry
-	mu         *sync.Mutex
+	sync.Mutex
 }

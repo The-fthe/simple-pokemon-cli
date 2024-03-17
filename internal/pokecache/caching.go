@@ -2,14 +2,12 @@ package pokecache
 
 import (
 	"fmt"
-	"sync"
 	"time"
 )
 
-func NewCache(interval time.Duration) Cache {
-	c := Cache{
+func NewCache(interval time.Duration) *Cache {
+	c := &Cache{
 		cacheTable: make(map[string]CacheEntry),
-		mu:         &sync.Mutex{},
 	}
 
 	go c.reapLoop(interval)
@@ -18,8 +16,8 @@ func NewCache(interval time.Duration) Cache {
 }
 
 func (c *Cache) Add(url string, data []byte) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	c.cacheTable[url] = CacheEntry{
 		createAt: time.Now().UTC(),
@@ -28,8 +26,8 @@ func (c *Cache) Add(url string, data []byte) {
 }
 
 func (c *Cache) Get(url string) ([]byte, bool) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.Lock()
+	defer c.Unlock()
 
 	entry, ok := c.cacheTable[url]
 	return entry.val, ok
@@ -46,8 +44,8 @@ func (c *Cache) reapLoop(interval time.Duration) {
 }
 
 func (c *Cache) reap(now time.Time, interval time.Duration) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.Lock()
+	defer c.Unlock()
 	for url, entry := range c.cacheTable {
 		if entry.createAt.Before(now.Add(-interval)) {
 			delete(c.cacheTable, url)

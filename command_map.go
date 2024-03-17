@@ -6,6 +6,7 @@ import (
 )
 
 func commandMapForward(c *Config) error {
+	println("paramter", *c.parameter)
 
 	locationsResp, err := c.pokeapiClient.ListLocation(c.nextLocationURL)
 	if err != nil {
