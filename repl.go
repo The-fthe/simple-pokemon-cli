@@ -27,9 +27,10 @@ func startRepl(c *Config) {
 		}
 
 		cmdName := words[0]
-		//c.parameter = &words[1]
-		test := "test"
-		c.parameter = &test
+		if len(words) == 2 {
+			c.parameter = &words[1]
+		}
+
 		cmd, ok := getCommands()[cmdName]
 		if ok {
 			err := cmd.callback(c)
@@ -77,6 +78,11 @@ func getCommands() map[string]cliCommand {
 			name:        "map back",
 			description: "display previous 20 locations",
 			callback:    commandMapPrevious,
+		},
+		"explore": {
+			name:        "explore map",
+			description: "explore the location map",
+			callback:    commandMapExplore,
 		},
 	}
 }

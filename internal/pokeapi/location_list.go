@@ -2,6 +2,8 @@ package pokeapi
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
 	"io"
 	"net/http"
 )
@@ -45,5 +47,45 @@ func (c *Client) ListLocation(pageURL *string) (RespLocations, error) {
 
 	c.cache.Add(url, dat)
 	return locationResp, nil
+
+}
+
+func (c *Client) ExploreLocation(location *string) (RespExp, error) {
+	if location == nil {
+		return RespExp{}, errors.New("location is empty")
+	}
+	url := BASE_URL + "/location-area" + "/" + *location
+	// if dat, ok := c.cache.Get(url); ok {
+	// 	RespExp := RespExp{}
+	// 	err := json.Unmarshal(dat, &RespExp)
+	// 	if err != nil {
+	// 		return RespExp, err
+	// 	}
+	// 	return RespExp, nil
+	// }
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return RespExp{}, err
+	}
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return RespExp{}, err
+	}
+
+	fmt.Println(url)
+	dat, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return RespExp{}, err
+	}
+
+	respExp := RespExp{}
+	err = json.Unmarshal(dat, &respExp)
+	if err != nil {
+		return RespExp{}, err
+	}
+
+	// c.cache.Add(url, dat)
+	return respExp, nil
 
 }
