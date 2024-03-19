@@ -9,6 +9,7 @@ type RespLocations struct {
 		URL  string `json:"url"`
 	} `json:"results"`
 }
+
 type RespExp struct {
 	EncounterMethodRates []struct {
 		EncounterMethod struct {

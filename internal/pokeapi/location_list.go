@@ -2,7 +2,6 @@ package pokeapi
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -37,7 +36,6 @@ func (c *Client) ListLocation(pageURL *string) (RespLocations, error) {
 	if err != nil {
 		return RespLocations{}, err
 	}
-	// c.cache := pokecache.NewCache(5 * time.Second)
 
 	locationResp := RespLocations{}
 	err = json.Unmarshal(dat, &locationResp)
@@ -50,19 +48,16 @@ func (c *Client) ListLocation(pageURL *string) (RespLocations, error) {
 
 }
 
-func (c *Client) ExploreLocation(location *string) (RespExp, error) {
-	if location == nil {
-		return RespExp{}, errors.New("location is empty")
+func (c *Client) ExploreLocation(location string) (RespExp, error) {
+	url := BASE_URL + "/location-area" + "/" + location
+	if dat, ok := c.cache.Get(url); ok {
+		RespExp := RespExp{}
+		err := json.Unmarshal(dat, &RespExp)
+		if err != nil {
+			return RespExp, err
+		}
+		return RespExp, nil
 	}
-	url := BASE_URL + "/location-area" + "/" + *location
-	// if dat, ok := c.cache.Get(url); ok {
-	// 	RespExp := RespExp{}
-	// 	err := json.Unmarshal(dat, &RespExp)
-	// 	if err != nil {
-	// 		return RespExp, err
-	// 	}
-	// 	return RespExp, nil
-	// }
 
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
@@ -85,7 +80,7 @@ func (c *Client) ExploreLocation(location *string) (RespExp, error) {
 		return RespExp{}, err
 	}
 
-	// c.cache.Add(url, dat)
+	c.cache.Add(url, dat)
 	return respExp, nil
 
 }

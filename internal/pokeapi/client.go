@@ -1,10 +1,9 @@
 package pokeapi
 
 import (
+	"github.com/The-fthe/pokedex/internal/pokecache"
 	"net/http"
 	"time"
-
-	"github.com/The-fthe/pokedex/internal/pokecache"
 )
 
 // Client

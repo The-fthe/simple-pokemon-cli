@@ -10,9 +10,9 @@ import (
 
 type Config struct {
 	pokeapiClient   *pokeapi.Client
-	parameter       *string
 	nextLocationURL *string
 	prevLocationURL *string
+	trainer         Trainer
 }
 
 func startRepl(c *Config) {
@@ -27,13 +27,14 @@ func startRepl(c *Config) {
 		}
 
 		cmdName := words[0]
-		if len(words) == 2 {
-			c.parameter = &words[1]
+		args := []string{}
+		if len(words) > 1 {
+			args = words[1:]
 		}
 
 		cmd, ok := getCommands()[cmdName]
 		if ok {
-			err := cmd.callback(c)
+			err := cmd.callback(c, args...)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -54,7 +55,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*Config) error
+	callback    func(*Config, ...string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -80,9 +81,14 @@ func getCommands() map[string]cliCommand {
 			callback:    commandMapPrevious,
 		},
 		"explore": {
-			name:        "explore map",
+			name:        "explore <locaiton map>",
 			description: "explore the location map",
 			callback:    commandMapExplore,
+		},
+		"catch": {
+			name:        "catch <pokemon name>",
+			description: "try to catch pokemon",
+			callback:    commandCatch,
 		},
 	}
 }
