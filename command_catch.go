@@ -13,14 +13,14 @@ func commandCatch(c *Config, args ...string) error {
 
 	pokemonName := args[0]
 
-	fmt.Printf("Throwing a Pokeball at %s \n", pokemonName)
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokemonName)
 
 	pokemon, err := c.pokeapiClient.GetPokemon(pokemonName)
 	if err != nil {
 		return errors.New("pokemon name is not valid\n")
 	}
 	randomCatchChance := rand.Intn(pokemon.BaseExperience)
-	fmt.Printf("base exp: %d , catch Chance: %d \n", pokemon.BaseExperience, randomCatchChance)
+	//fmt.Printf("base exp: %d , catch Chance: %d \n", pokemon.BaseExperience, randomCatchChance)
 
 	if randomCatchChance > 40 {
 		return fmt.Errorf("%s escaped!\n", pokemonName)

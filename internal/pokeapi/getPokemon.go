@@ -2,7 +2,6 @@ package pokeapi
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -25,7 +24,7 @@ func (c *Client) GetPokemon(pokemon string) (Pokemon, error) {
 	if err != nil {
 		return Pokemon{}, err
 	}
-	fmt.Println(url)
+	// fmt.Println(url)
 	dat, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return Pokemon{}, err

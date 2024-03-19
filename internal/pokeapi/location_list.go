@@ -2,7 +2,6 @@ package pokeapi
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -68,7 +67,7 @@ func (c *Client) ExploreLocation(location string) (RespExp, error) {
 		return RespExp{}, err
 	}
 
-	fmt.Println(url)
+	// fmt.Println(url)
 	dat, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return RespExp{}, err
