@@ -44,6 +44,16 @@ func (t *Trainer) InspectPokemon(pokemonName string) error {
 	}
 	return errors.New("you have not caught that pokemon")
 }
+func (t *Trainer) PrintContainPokemon() error {
+	if t.CaughtPokemon == nil {
+		return errors.New("Pokedex is empty")
+	}
+	fmt.Printf("Your Pokedex:\n")
+	for _, pokemon := range t.CaughtPokemon {
+		fmt.Printf(" -%s\n", pokemon.Name)
+	}
+	return nil
+}
 
 func GetBaseStat(p pokeapi.Pokemon, statName string) int {
 	for _, stat := range p.Stats {
