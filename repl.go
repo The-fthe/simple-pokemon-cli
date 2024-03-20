@@ -3,9 +3,11 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/The-fthe/pokedex/internal/pokeapi"
 	"os"
 	"strings"
+
+	"github.com/The-fthe/pokedex/internal/pokeapi"
+	"github.com/chzyer/readline"
 )
 
 type Config struct {
@@ -16,6 +18,42 @@ type Config struct {
 }
 
 func startRepl(c *Config) {
+	rl, err := readline.New("Pokedex > ")
+	if err != nil {
+		fmt.Printf("REadline error: %s\n", err)
+	}
+	defer rl.Close()
+	for {
+		line, err := rl.Readline()
+		if err != nil {
+			break
+		}
+		words := cleanInput(line)
+		if len(words) == 0 {
+			continue
+		}
+
+		cmdName := words[0]
+		args := []string{}
+		if len(words) > 1 {
+			args = words[1:]
+		}
+
+		cmd, ok := getCommands()[cmdName]
+		if ok {
+			err := cmd.callback(c, args...)
+			if err != nil {
+				fmt.Println(err)
+			}
+			continue
+		} else {
+			fmt.Println("Unknown command")
+			continue
+		}
+	}
+}
+
+func startRepl1(c *Config) {
 	reader := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex >")

@@ -29,8 +29,8 @@ func (t *Trainer) NewPokedex() {
 func (t *Trainer) InspectPokemon(pokemonName string) error {
 	if pokemon, ok := t.CaughtPokemon[pokemonName]; ok {
 		fmt.Printf("Name: %s \n", pokemon.Name)
-		fmt.Printf("Height: %s \n", pokemon.Name)
-		fmt.Printf("Weight: %s \n", pokemon.Name)
+		fmt.Printf("Height: %d \n", pokemon.Height)
+		fmt.Printf("Weight: %d \n", pokemon.Weight)
 		fmt.Printf("Stats: \n")
 		fmt.Printf("  -hp: %d \n", GetBaseStat(pokemon, "hp"))
 		fmt.Printf("  -attack: %d \n", GetBaseStat(pokemon, "attack"))
